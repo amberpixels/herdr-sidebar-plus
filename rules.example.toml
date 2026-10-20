@@ -1,0 +1,18 @@
+# Copy to "$(herdr plugin config-dir amberpixels.sidebar-plus)/rules.toml".
+#
+# Each [[project]] scopes its rules to one repository: `repo` matches the
+# worktree's repo name, `path` its repo root (`~` is expanded). Leave both out
+# to apply everywhere. The first project that applies wins.
+#
+# `match` gates the project: its steps run only when the regex matches the
+# workspace name. Steps are regex replacements applied in order; `replace`
+# uses Go's syntax, so write capture groups as ${1}.
+
+[[project]]
+repo = "acme"
+match = '^(acme\.)?PROJ-\d+[/-]'
+steps = [
+  { find = '^acme\.', replace = '' },             # acme.PROJ-1250-... -> PROJ-1250-...
+  { find = '^PROJ-(\d+)[/-]', replace = '${1}: ' },  # PROJ-1234/... -> 1234: ...
+  { find = '-', replace = ' ' },                   # fix-invoice -> fix invoice
+]
