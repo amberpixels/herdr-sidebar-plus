@@ -92,20 +92,37 @@ func (c *Client) Call(method string, params, out any) error {
 	return json.Unmarshal(resp.Result, out)
 }
 
-// Worktree is the Git provenance Herdr records for worktree-backed workspaces.
-type Worktree struct {
+// Repo names a workspace's Git repository. A linked worktree reports its main
+// repo, so every checkout of one project shares the same Repo.
+type Repo struct {
 	RepoName string `json:"repo_name"`
 	RepoRoot string `json:"repo_root"`
 }
 
 type Workspace struct {
-	ID       string            `json:"workspace_id"`
-	Label    string            `json:"label"`
-	Tokens   map[string]string `json:"tokens"`
-	Worktree *Worktree         `json:"worktree"`
+	ID     string            `json:"workspace_id"`
+	Label  string            `json:"label"`
+	Tokens map[string]string `json:"tokens"`
+	// Worktree is set only for workspaces opened as worktrees.
+	Worktree *Repo `json:"worktree"`
+	// Repo follows the workspace's current directory. Only Herdr builds with the
+	// projects indicator style report it.
+	Repo *Repo `json:"repo"`
 }
 
-// Agent is one live agent, in the order Herdr's agent panel shows them.
+// CurrentRepo prefers the live repo and falls back to worktree provenance.
+func (w Workspace) CurrentRepo() Repo {
+	switch {
+	case w.Repo != nil:
+		return *w.Repo
+	case w.Worktree != nil:
+		return *w.Worktree
+	default:
+		return Repo{}
+	}
+}
+
+// Agent is one live agent.
 type Agent struct {
 	PaneID      string            `json:"pane_id"`
 	WorkspaceID string            `json:"workspace_id"`
@@ -143,16 +160,5 @@ func (c *Client) ReportPaneTokens(paneID, source string, tokens map[string]*stri
 		"pane_id": paneID,
 		"source":  source,
 		"tokens":  tokens,
-	}, nil)
-}
-
-func (c *Client) FocusAgent(target string) error {
-	return c.Call("agent.focus", map[string]string{"target": target}, nil)
-}
-
-func (c *Client) OpenPluginPane(pluginID, entrypoint string) error {
-	return c.Call("plugin.pane.open", map[string]any{
-		"plugin_id":  pluginID,
-		"entrypoint": entrypoint,
 	}, nil)
 }

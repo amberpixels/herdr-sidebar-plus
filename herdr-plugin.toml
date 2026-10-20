@@ -1,8 +1,8 @@
 id = "amberpixels.sidebar-plus"
 name = "Sidebar Plus"
-version = "0.1.0"
+version = "0.2.0"
 min_herdr_version = "0.9.5"
-description = "Numbered agents, a two-digit agent jump, and per-project regex labels for sidebar names"
+description = "Per-project regex labels and project icons for sidebar names"
 platforms = ["linux", "macos"]
 
 [[build]]
@@ -12,7 +12,7 @@ command = ["go", "build", "-o", "bin/herdr-sidebar-plus", "./cmd/herdr-sidebar-p
 [[startup]]
 command = ["bin/herdr-sidebar-plus", "refresh"]
 
-# Every event that can add, remove, rename, or reorder a workspace or an agent.
+# Every event that can add, remove, or rename a workspace or an agent.
 [[events]]
 on = "workspace.created"
 command = ["bin/herdr-sidebar-plus", "refresh"]
@@ -89,18 +89,5 @@ command = ["bin/herdr-sidebar-plus", "refresh"]
 
 [[actions]]
 id = "refresh"
-title = "Refresh sidebar labels and numbers"
+title = "Refresh sidebar labels and icons"
 command = ["bin/herdr-sidebar-plus", "refresh"]
-
-[[actions]]
-id = "jump"
-title = "Jump to agent by number"
-command = ["bin/herdr-sidebar-plus", "open-jump"]
-
-[[panes]]
-id = "jump"
-title = "Jump to agent"
-placement = "popup"
-width = 24
-height = 5
-command = ["bin/herdr-sidebar-plus", "jump"]

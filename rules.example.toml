@@ -1,8 +1,10 @@
 # Copy to "$(herdr plugin config-dir amberpixels.sidebar-plus)/rules.toml".
 #
 # Each [[project]] scopes its rules to one repository: `repo` matches the
-# worktree's repo name, `path` its repo root (`~` is expanded). Leave both out
+# workspace's repo name, `path` its repo root (`~` is expanded). Leave both out
 # to apply everywhere. The first project that applies wins.
+#
+# `icon` marks every workspace and agent of the repo, regardless of `match`.
 #
 # `match` gates the project: its steps run only when the regex matches the
 # workspace name. Steps are regex replacements applied in order; `replace`
@@ -10,6 +12,7 @@
 
 [[project]]
 repo = "orchard"
+icon = "󰔱"                       # nf-md-tree; any single glyph works
 match = '^(orchard\.)?ORC-\d+[/-]'
 steps = [
   { find = '^orchard\.', replace = '' },          # orchard.ORC-1250-... -> ORC-1250-...

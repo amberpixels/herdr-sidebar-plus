@@ -15,7 +15,7 @@ build:
 link: build
     herdr plugin link .
 
-# Recompute every label and number now
+# Recompute every label and icon now
 [group('dev')]
 refresh:
     herdr plugin action invoke amberpixels.sidebar-plus.refresh

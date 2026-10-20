@@ -1,5 +1,5 @@
 // Command herdr-sidebar-plus is the single binary behind the plugin's startup
-// hook, event hooks, jump action, and jump popup.
+// hook, event hooks, and refresh action.
 package main
 
 import (
@@ -13,25 +13,17 @@ import (
 	"github.com/amberpixels/herdr-sidebar-plus/internal/sidebar"
 )
 
-const (
-	pluginID      = "amberpixels.sidebar-plus"
-	jumpPaneID    = "jump"
-	rulesFileName = "rules.toml"
-)
+const rulesFileName = "rules.toml"
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, "usage: herdr-sidebar-plus refresh|open-jump|jump")
+		fmt.Fprintln(os.Stderr, "usage: herdr-sidebar-plus refresh")
 		os.Exit(2)
 	}
 	var err error
 	switch os.Args[1] {
 	case "refresh":
 		err = refresh()
-	case "open-jump":
-		err = withClient(func(c *herdr.Client) error { return c.OpenPluginPane(pluginID, jumpPaneID) })
-	case "jump":
-		err = jump()
 	default:
 		err = fmt.Errorf("unknown command %q", os.Args[1])
 	}

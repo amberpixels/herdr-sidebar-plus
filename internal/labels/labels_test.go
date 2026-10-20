@@ -94,3 +94,31 @@ match = '('`), 0o600); err != nil {
 		t.Error("invalid regex should fail to load")
 	}
 }
+
+func TestIconIgnoresMatchAndPicksFirstScopedProject(t *testing.T) {
+	rules := load(t, orchard+`icon = "@"
+
+[[project]]
+repo = "billing"
+match = '^never$'
+icon = " $ "
+
+[[project]]
+icon = "*"
+`)
+	cases := []struct{ repo, want string }{
+		{"orchard", "@"},
+		// The match gate only guards label steps, and icons are trimmed.
+		{"billing", "$"},
+		// The catch-all project marks everything else.
+		{"docs", "*"},
+	}
+	for _, tc := range cases {
+		if got := rules.Icon(tc.repo, ""); got != tc.want {
+			t.Errorf("Icon(%q) = %q, want %q", tc.repo, got, tc.want)
+		}
+	}
+	if got := load(t, orchard).Icon("orchard", ""); got != "" {
+		t.Errorf("no icon configured, got %q", got)
+	}
+}

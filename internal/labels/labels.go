@@ -19,13 +19,15 @@ type Config struct {
 	Projects []Project `toml:"project"`
 }
 
-// Project scopes rules to one repository. Repo matches the worktree's repo name
+// Project scopes rules to one repository. Repo matches the workspace's repo name
 // and Path its repo root; with neither set the project applies everywhere.
-// Steps run in order only when Match (if set) matches the original name.
+// Steps run in order only when Match (if set) matches the original name. Icon
+// marks every workspace of the repo, whatever Match says.
 type Project struct {
 	Repo  string `toml:"repo"`
 	Path  string `toml:"path"`
 	Match string `toml:"match"`
+	Icon  string `toml:"icon"`
 	Steps []Step `toml:"steps"`
 }
 
@@ -44,6 +46,7 @@ type project struct {
 	repo  string
 	path  string
 	match *regexp.Regexp
+	icon  string
 	steps []step
 }
 
@@ -76,7 +79,7 @@ func Load(path string) (*Rules, error) {
 func Compile(cfg Config) (*Rules, error) {
 	rules := &Rules{}
 	for i, p := range cfg.Projects {
-		compiled := project{repo: p.Repo, path: expandHome(p.Path)}
+		compiled := project{repo: p.Repo, path: expandHome(p.Path), icon: strings.TrimSpace(p.Icon)}
 		if p.Match != "" {
 			re, err := regexp.Compile(p.Match)
 			if err != nil {
@@ -101,10 +104,7 @@ func Compile(cfg Config) (*Rules, error) {
 // applies wins; an empty result falls back to the name so no row goes blank.
 func (r *Rules) Label(name, repoName, repoRoot string) string {
 	for _, p := range r.projects {
-		if p.repo != "" && p.repo != repoName {
-			continue
-		}
-		if p.path != "" && filepath.Clean(p.path) != filepath.Clean(repoRoot) {
+		if !p.scopes(repoName, repoRoot) {
 			continue
 		}
 		if p.match != nil && !p.match.MatchString(name) {
@@ -120,6 +120,24 @@ func (r *Rules) Label(name, repoName, repoRoot string) string {
 		return name
 	}
 	return name
+}
+
+// Icon returns the icon of the first project scoped to the repo that sets one,
+// or "" when none does.
+func (r *Rules) Icon(repoName, repoRoot string) string {
+	for _, p := range r.projects {
+		if p.icon != "" && p.scopes(repoName, repoRoot) {
+			return p.icon
+		}
+	}
+	return ""
+}
+
+func (p project) scopes(repoName, repoRoot string) bool {
+	if p.repo != "" && p.repo != repoName {
+		return false
+	}
+	return p.path == "" || filepath.Clean(p.path) == filepath.Clean(repoRoot)
 }
 
 func expandHome(path string) string {
