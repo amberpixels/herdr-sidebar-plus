@@ -50,6 +50,20 @@ description = "jump to agent by number"
 
 In the jump prompt, any key other than a digit (Esc included) closes it without moving focus.
 
+## Follow `cd`
+
+Herdr renames a space after its shell changes directory, but fires no event a plugin can hook. Without help, `$label` catches up only on the next focus change. For zsh, add this hook to `.zshrc` to refresh on every `cd` inside Herdr:
+
+```zsh
+if [[ -n $HERDR_ENV ]]; then
+  autoload -Uz add-zsh-hook
+  _herdr_sidebar_plus_chpwd() {
+    "${HERDR_BIN_PATH:-herdr}" plugin action invoke amberpixels.sidebar-plus.refresh >/dev/null 2>&1 &!
+  }
+  add-zsh-hook chpwd _herdr_sidebar_plus_chpwd
+fi
+```
+
 ## Label rules
 
 Rules live in `rules.toml` in the plugin's config directory:
@@ -78,7 +92,7 @@ Rules are read on every refresh. After editing them, run `just refresh` (or `her
 
 ## How it works
 
-A startup hook and hooks on workspace, tab, pane, and worktree lifecycle events run `herdr-sidebar-plus refresh`. It reads `workspace.list` and `agent.list`, computes labels and numbers, and reports only the values that changed. A lock file serializes refreshes that fire in a burst.
+A startup hook and hooks on workspace, tab, pane, and worktree lifecycle and focus events run `herdr-sidebar-plus refresh`. It reads `workspace.list` and `agent.list`, computes labels and numbers, and reports only the values that changed. A lock file serializes refreshes that fire in a burst.
 
 ## Limits
 
@@ -86,6 +100,7 @@ A startup hook and hooks on workspace, tab, pane, and worktree lifecycle events 
 - Herdr trims token values, so two-digit numbers cannot be padded into a right-aligned column.
 - Numbers follow `agent.list` order, which matches the agent panel in `spaces` sort. In `priority` sort the panel reorders on every status change, and the numbers will not follow it.
 - Labels update when an event fires, so a rename shows the old text for a moment.
+- A space renamed by a `cd` keeps its old label until the next focus change, unless the shell runs the [`cd` hook](#follow-cd).
 
 ## License
 

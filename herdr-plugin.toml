@@ -65,6 +65,28 @@ command = ["bin/herdr-sidebar-plus", "refresh"]
 on = "pane.agent_detected"
 command = ["bin/herdr-sidebar-plus", "refresh"]
 
+[[events]]
+on = "workspace.updated"
+command = ["bin/herdr-sidebar-plus", "refresh"]
+
+[[events]]
+on = "worktree.opened"
+command = ["bin/herdr-sidebar-plus", "refresh"]
+
+[[events]]
+on = "worktree.removed"
+command = ["bin/herdr-sidebar-plus", "refresh"]
+
+# Herdr renames a space when its shell changes directory but fires no event for
+# it. Focus events catch such names up; the README's chpwd hook does it at once.
+[[events]]
+on = "workspace.focused"
+command = ["bin/herdr-sidebar-plus", "refresh"]
+
+[[events]]
+on = "pane.focused"
+command = ["bin/herdr-sidebar-plus", "refresh"]
+
 [[actions]]
 id = "refresh"
 title = "Refresh sidebar labels and numbers"
