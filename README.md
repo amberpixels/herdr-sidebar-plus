@@ -5,11 +5,11 @@ A [Herdr](https://herdr.dev) plugin that makes the sidebar easier to scan and dr
 - **Numbered agents.** Every agent gets a `$num` token: its position in the agent panel, past 9 too.
 - **Two-digit jump.** `prefix+0` opens a tiny prompt; type two digits to focus that agent (`0 7`, `1 2`).
 - **Readable labels.** A `$label` token on every space and agent, rewritten by per-project regex rules.
-  `PROJ-1234/fix-invoice-rounding-on-refunds` becomes `1234: fix invoice rounding on refunds`.
+  `ORC-1234/fix-invoice-rounding-on-refunds` becomes `1234: fix invoice rounding on refunds`.
 
 ```text
- ○ acme · main              ○ 1 · acme
-   ├─ ○ 1234: fix inv…      ○ 2 · docs-site
+ ○ orchard · main           ○ 1 · orchard
+   ├─ ○ 1234: fix inv…      ○ 2 · orchard-docs
    └─ ○ 1250: add dar…      ○ 3 · 1234: fix invoic…
 ```
 
@@ -60,11 +60,11 @@ cp rules.example.toml "$(herdr plugin config-dir amberpixels.sidebar-plus)/rules
 
 ```toml
 [[project]]
-repo = "acme"                        # worktree repo name; or `path = "~/code/acme"`
-match = '^(acme\.)?PROJ-\d+[/-]'    # only rewrite names that look like tasks
+repo = "orchard"                    # worktree repo name; or `path = "~/code/orchard"`
+match = '^(orchard\.)?ORC-\d+[/-]'  # only rewrite names that look like tasks
 steps = [
-  { find = '^acme\.', replace = '' },
-  { find = '^PROJ-(\d+)[/-]', replace = '${1}: ' },
+  { find = '^orchard\.', replace = '' },
+  { find = '^ORC-(\d+)[/-]', replace = '${1}: ' },
   { find = '-', replace = ' ' },
 ]
 ```

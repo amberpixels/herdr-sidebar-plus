@@ -9,10 +9,10 @@
 # uses Go's syntax, so write capture groups as ${1}.
 
 [[project]]
-repo = "acme"
-match = '^(acme\.)?PROJ-\d+[/-]'
+repo = "orchard"
+match = '^(orchard\.)?ORC-\d+[/-]'
 steps = [
-  { find = '^acme\.', replace = '' },             # acme.PROJ-1250-... -> PROJ-1250-...
-  { find = '^PROJ-(\d+)[/-]', replace = '${1}: ' },  # PROJ-1234/... -> 1234: ...
-  { find = '-', replace = ' ' },                   # fix-invoice -> fix invoice
+  { find = '^orchard\.', replace = '' },          # orchard.ORC-1250-... -> ORC-1250-...
+  { find = '^ORC-(\d+)[/-]', replace = '${1}: ' },  # ORC-1234/... -> 1234: ...
+  { find = '-', replace = ' ' },                    # fix-invoice -> fix invoice
 ]

@@ -6,13 +6,13 @@ import (
 	"testing"
 )
 
-const acme = `
+const orchard = `
 [[project]]
-repo = "acme"
-match = '^(acme\.)?PROJ-\d+[/-]'
+repo = "orchard"
+match = '^(orchard\.)?ORC-\d+[/-]'
 steps = [
-  { find = '^acme\.', replace = '' },
-  { find = '^PROJ-(\d+)[/-]', replace = '${1}: ' },
+  { find = '^orchard\.', replace = '' },
+  { find = '^ORC-(\d+)[/-]', replace = '${1}: ' },
   { find = '-', replace = ' ' },
 ]
 `
@@ -31,17 +31,17 @@ func load(t *testing.T, body string) *Rules {
 }
 
 func TestLabel(t *testing.T) {
-	rules := load(t, acme)
+	rules := load(t, orchard)
 	cases := []struct {
 		name, repo, want string
 	}{
-		{"PROJ-1234/fix-invoice-rounding-on-refunds", "acme", "1234: fix invoice rounding on refunds"},
-		{"acme.PROJ-1250-add-dark-mode-toggle", "acme", "1250: add dark mode toggle"},
+		{"ORC-1234/fix-invoice-rounding-on-refunds", "orchard", "1234: fix invoice rounding on refunds"},
+		{"orchard.ORC-1250-add-dark-mode-toggle", "orchard", "1250: add dark mode toggle"},
 		// The gate keeps names without a task prefix untouched.
-		{"acme", "acme", "acme"},
-		{"docs-site", "", "docs-site"},
+		{"orchard", "orchard", "orchard"},
+		{"orchard-docs", "", "orchard-docs"},
 		// Rules are scoped to their repo.
-		{"PROJ-1/other-repo", "billing", "PROJ-1/other-repo"},
+		{"ORC-1/other-repo", "billing", "ORC-1/other-repo"},
 	}
 	for _, tc := range cases {
 		if got := rules.Label(tc.name, tc.repo, ""); got != tc.want {
